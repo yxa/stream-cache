@@ -30,7 +30,6 @@ StreamCache.prototype._write = function (chunk, enc) {
 };
 
 StreamCache.prototype.pipe = function(sink, options) {
-    if(options) throw Error("options not supported");
     this._chunks.forEach(function(chunk) {
         sink.write(chunk);
     });
@@ -40,14 +39,17 @@ StreamCache.prototype.pipe = function(sink, options) {
         return sink;
     }
     this._sinks.push(sink);
-    return sink;
+    var v = Duplex.prototype.pipe.call(this,sink, options);
+    console.log("hej");
+    console.log(v);
+
 };
 
 StreamCache.prototype.end = function() {
     this._sinks.forEach(function(sink) {
         try {
             sink.end();
-        }catch(e) {  //why cant we close process stdout, ugly hack?
+        }catch(e){
             if(e.toString() !== 'Error: process.stdout cannot be closed.') {
                 throw e;
             }
@@ -65,3 +67,11 @@ StreamCache.prototype.getLength = function() {
 };
 
 module.exports = StreamCache;
+
+var fs          = require('fs');
+
+var cache = new StreamCache();
+fs.createReadStream(__filename).pipe(cache);
+
+
+cache.pipe(process.stdout,{end: false});
