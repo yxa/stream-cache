@@ -47,8 +47,7 @@ StreamCache.prototype.pipe = function(sink, options) {
 
 StreamCache.prototype.end = function() {
     this._sinks.forEach(function(sink) {
-         console.log(sink);
-        //sink.end();
+        sink.end();
     });
 
     this._ended = true;
@@ -60,14 +59,3 @@ StreamCache.prototype.getLength = function() {
     return totalLength + chunk.length;
   }, 0);
 };
-
-
-
-var fs          = require('fs');
-
-var cache = new StreamCache();
-fs.createReadStream('data.txt').pipe(cache);
-
-// Cache can now be piped anywhere, even before the readable stream finishes.
-cache.pipe(process.stdout);
-
