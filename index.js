@@ -2,7 +2,6 @@ var stream = require('stream');
 var util = require('util');
 var Duplex = stream.Duplex || require('readable-stream').Duplex;
 
-
 function StreamCache(options) {
   if (!(this instanceof StreamCache)) {
     return new StreamCache(options);
@@ -30,7 +29,6 @@ StreamCache.prototype._write = function (chunk, enc) {
     });
 };
 
-
 StreamCache.prototype.pipe = function(sink, options) {
     if(options) throw Error("options not supported");
     this._chunks.forEach(function(chunk) {
@@ -47,7 +45,13 @@ StreamCache.prototype.pipe = function(sink, options) {
 
 StreamCache.prototype.end = function() {
     this._sinks.forEach(function(sink) {
-        sink.end();
+        try {
+            sink.end();
+        }catch(e) {  //why cant we close process stdout, ugly hack?
+            if(e.toString() !== 'Error: process.stdout cannot be closed.') {
+                throw e;
+            }
+        }
     });
 
     this._ended = true;
