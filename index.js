@@ -59,3 +59,5 @@ StreamCache.prototype.getLength = function() {
     return totalLength + chunk.length;
   }, 0);
 };
+
+module.exports = StreamCache;
