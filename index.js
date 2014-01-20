@@ -39,21 +39,13 @@ StreamCache.prototype.pipe = function(sink, options) {
         return sink;
     }
     this._sinks.push(sink);
-    var v = Duplex.prototype.pipe.call(this,sink, options);
-    console.log("hej");
-    console.log(v);
+    return sink;
 
 };
 
 StreamCache.prototype.end = function() {
     this._sinks.forEach(function(sink) {
-        try {
-            sink.end();
-        }catch(e){
-            if(e.toString() !== 'Error: process.stdout cannot be closed.') {
-                throw e;
-            }
-        }
+        sink.end();
     });
 
     this._ended = true;
@@ -68,10 +60,11 @@ StreamCache.prototype.getLength = function() {
 
 module.exports = StreamCache;
 
-var fs          = require('fs');
+var fs = require('fs');
 
 var cache = new StreamCache();
 fs.createReadStream(__filename).pipe(cache);
 
+process.stdout.on('error', process.exit);
 
-cache.pipe(process.stdout,{end: false});
+cache.pipe(process.stdout);
