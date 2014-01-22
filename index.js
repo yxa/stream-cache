@@ -59,12 +59,3 @@ StreamCache.prototype.getLength = function() {
 };
 
 module.exports = StreamCache;
-
-var fs = require('fs');
-
-var cache = new StreamCache();
-fs.createReadStream(__filename).pipe(cache);
-
-process.stdout.on('error', process.exit);
-
-cache.pipe(process.stdout);
